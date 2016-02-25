@@ -48,7 +48,7 @@ def fetch():
     if message_info:
         tmp = template.page.get_html(message_info)
         with open('html/%s.html' %
-                  time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'w') \
+                  time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime()), 'w') \
                 as handler:
             handler.write(tmp)
 
