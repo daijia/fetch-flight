@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import time
+import datetime
 
 
 class City(object):
@@ -16,19 +17,20 @@ class Airport(object):
 
 class Website(object):
     CTRIP = 0
-    QUNAR = 1
-    ALITRIP = 2
     CEAIR = 3
     AIRCHINA = 4
     CH = 5
     CSAIR = 6
-    JUNEYAOAIR = 7
 
 
+THREAD_COUNT = 5
 AVAILABLE_WEBSITES = [Website.CTRIP, Website.CH, Website.CEAIR, Website.CSAIR,
                       Website.AIRCHINA]
-# AVAILABLE_WEBSITES = [Website.CTRIP, Website.CEAIR]
 WEEK_NUM = 10
+MAX_EMAIL_FLIGHT_COUNT = 8
+MAX_STORE_FLIGHT_COUNT = 20
+PRICE_FLUCTUATION = 0
+
 
 PERIODS = [
     {
@@ -39,7 +41,6 @@ PERIODS = [
         'from_city': City.SHANGHAI,
         'to_city': City.CHONGQING,
         'date': '2016-03-01',
-        'limit': 5,
     },
 
     # {
@@ -50,7 +51,6 @@ PERIODS = [
     #     'to_city': City.SHANGHAI,
     #     'from_city': City.CHONGQING,
     #     'week_day': 0,
-    #     'limit': 3,
     # },
     # {
     #     'begin_time': ['18:00', '21:00'],
@@ -60,7 +60,6 @@ PERIODS = [
     #     'from_city': City.SHANGHAI,
     #     'to_city': City.CHONGQING,
     #     'week_day': 5,
-    #     'limit': 3,
     # },
     # {
     #     'begin_time': ['06:00', '10:00'],
@@ -70,19 +69,15 @@ PERIODS = [
     #     'from_city': City.SHANGHAI,
     #     'to_city': City.CHONGQING,
     #     'week_day': 6,
-    #     'limit': 3,
     # },
 ]
 
 WEBSITE_NAME = {
     Website.CTRIP: u'携程',
-    Website.QUNAR: u'去哪儿',
-    Website.ALITRIP: u'去啊',
     Website.CEAIR: u'东航',
     Website.AIRCHINA: u'国航',
     Website.CH: u'春秋',
     Website.CSAIR: u'南航',
-    Website.JUNEYAOAIR: u'吉祥',
 }
 
 CITY_NAME = {
@@ -99,8 +94,6 @@ AIRPORT_NAME = {
 
 URL_PARAMS = {
     Website.CTRIP: {City.SHANGHAI: u'SHA', City.CHONGQING: u'CKG'},
-    Website.QUNAR: {City.SHANGHAI: (u'上海', u'SHA'),
-                    City.CHONGQING: (u'重庆', u'CKG')},
     Website.CEAIR: {City.SHANGHAI: u'pvg', City.CHONGQING: u'ckg'},
     Website.CSAIR: {Airport.HONGQIAO: u'SHA', Airport.JIANGBEI: u'CKG',
                     Airport.PUDONG: u'PVG'},
@@ -109,16 +102,12 @@ URL_PARAMS = {
     Website.AIRCHINA: {Airport.HONGQIAO: u'SHA',
                        Airport.JIANGBEI: u'CKG',
                        Airport.PUDONG: u'PVG'},
-    Website.JUNEYAOAIR: {City.SHANGHAI: (u'上海', u'SHA'),
-                         City.CHONGQING: (u'重庆', u'CKG')},
 }
 
 
 AIRPORT_NAME_PARAMS = {
     Website.CTRIP: {Airport.HONGQIAO: u'虹桥国际机场', Airport.PUDONG: u'浦东国际机场',
                     Airport.JIANGBEI: u'江北国际机场'},
-    Website.QUNAR: {Airport.HONGQIAO: u'虹桥机场', Airport.PUDONG: u'浦东机场',
-                    Airport.JIANGBEI: u'江北机场'},
     Website.CEAIR: {Airport.HONGQIAO: u'虹桥机场', Airport.PUDONG: u'浦东机场',
                     Airport.JIANGBEI: u'江北机场'},
     Website.CSAIR: {Airport.HONGQIAO: u'上海虹桥', Airport.PUDONG: u'上海浦东',
@@ -128,9 +117,6 @@ AIRPORT_NAME_PARAMS = {
     Website.AIRCHINA: {Airport.HONGQIAO: u'SHA',
                        Airport.PUDONG: u'PVG',
                        Airport.JIANGBEI: u'CKG'},
-    Website.JUNEYAOAIR: {Airport.HONGQIAO: u'虹桥机场',
-                         Airport.PUDONG: u'浦东机场',
-                         Airport.JIANGBEI: u'江北机场'},
 }
 
 
@@ -157,3 +143,17 @@ for _period in PERIODS:
             _tmp_periods[-1].pop('week_day')
             _tmp_periods[-1]['date'] = date
 PERIODS = _tmp_periods
+
+
+# check settings
+for _period in PERIODS:
+    datetime.datetime.strptime(_period['date'], '%Y-%m-%d')
+    if '00:00' <= _period['begin_time'][0] <= '23:59' and \
+            '00:00' <= _period['begin_time'][1] <= '23:59' and \
+            '00:00' <= _period['end_time'][1] <= '23:59' and \
+            '00:00' <= _period['end_time'][1] <= '23:59':
+        pass
+    else:
+        print 'error period', _period
+        raise Exception
+

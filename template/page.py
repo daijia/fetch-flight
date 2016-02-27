@@ -70,6 +70,14 @@ main_page1 = '''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "
           text-align: center;
         }
 
+        h3 {
+          font-family: 'Amarante', Tahoma, sans-serif;
+          font-weight: bold;
+          font-size: 1.3em;
+          line-height: 1em;
+          margin-bottom: 10px;
+          text-align: center;
+        }
 
         /** page structure **/
         #wrapper {
@@ -155,6 +163,7 @@ body = '''
               %s
             </tbody>
           </table>
+          %s
          </div>
          '''
 
@@ -166,21 +175,66 @@ one_item = '''              <tr>
                 <td>%s</td>
               </tr>'''
 
+trend_info = """
+          <h3>%s</h3>
 
-def get_html(message_info):
+          <table id="keywords" cellspacing="0" cellpadding="0">
+            <thead>
+              <tr>
+                <th><span>价格</span></th>
+                <th><span>抓取时间</span></th>
+                <th><span>起落</span></th>
+                <th><span>来源</span></th>
+                <th><span>详细</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              %s
+            </tbody>
+          </table>
+"""
+
+trend_item = '''              <tr>
+                <td>%s</td>
+                <td>%s</td>
+                <td>%s => %s</td>
+                <td>%s</td>
+                <td>%s</td>
+              </tr>'''
+
+
+def get_html(message_info, trend_dict):
     divs = []
     for message in message_info:
         all_items = []
         for line in message['lines']:
             _date, website, url, flight = line
-            urls = url if isinstance(url, list) else [url]
-            url_info = '\n | '.join([u'<a href="%s">%s</a>'%(str(x), WEBSITE_NAME[website]) for x in urls])
+            url_info = u'<a href="%s">%s</a>' % (str(url), WEBSITE_NAME[website])
             all_items.append(
                 one_item % (u'¥'+str(flight[-1]), flight[2], AIRPORT_NAME[flight[1]],
                             flight[5], AIRPORT_NAME[flight[4]], url_info,
-                            flight[0][0:30]))
+                            flight[0][0:20]))
+        date_flights = trend_dict[(message['date'], message['from_city'],
+                                   message['to_city'])]
+        all_trend_items = []
+        for k in ['all'] + AVAILABLE_WEBSITES:
+            trend_flights = date_flights.get(k)
+            if not trend_flights or len(trend_flights) <= 1:
+                continue
+            tmp_items = []
+            for tmp in trend_flights:
+                tmp_items.append(
+                    trend_item % (u'¥'+str(tmp['price']),
+                                  tmp['fetch_time'],
+                                  tmp['from_time'],
+                                  tmp['to_time'],
+                                  WEBSITE_NAME[tmp['website']],
+                                  tmp['detail']))
+            head = u'汇总价格趋势' if k == 'all' else WEBSITE_NAME[k] + u'价格趋势'
+            all_trend_items.append(trend_info % (head, '\n'.join(tmp_items)))
         divs.append(body % (u'%s[%s] %s => %s的航班' %
-                     (message['date'], message['week_day_info'],
-                      message['from_city'], message['to_city']), '\n'.join(all_items)))
+                            (message['date'], message['week_day_info'],
+                             message['from_city_name'],
+                             message['to_city_name']),
+                            '\n'.join(all_items), '\n'.join(all_trend_items)))
     return main_page1 + u'\n'.join(divs) + main_page2
-    # return main_page

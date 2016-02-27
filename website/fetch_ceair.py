@@ -14,7 +14,8 @@ def dig_info(flight):
         for element in elements:
             if '00:00' <= element <= '23:59':
                 tmp_elements.append(element[0:5])
-            elif any([element.startswith(x) for x in AIRPORT_NAME_PARAMS[Website.CEAIR].values()]):
+            elif any([element.startswith(x)
+                      for x in AIRPORT_NAME_PARAMS[Website.CEAIR].values()]):
                 tmp_elements.append(element)
         from_time, from_airport, to_time, to_airport = tmp_elements
 
@@ -56,8 +57,7 @@ def fetch(period):
     block = util.fetch_one(browser, 'find_element_by_id', 'flight-info')
     if not block:
         return []
-    flights = util.fetch_multi(block, 'find_elements_by_class_name',
-                                 'section')
+    flights = util.fetch_multi(block, 'find_elements_by_class_name', 'section')
     format_flights = []
     for flight in flights:
         info = dig_info(flight)

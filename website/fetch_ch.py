@@ -33,8 +33,8 @@ def fetch(period):
     url = u'http://flights.ch.com/default/SearchByTime?Stype=0&IfRet=false&' \
           u'OriCity=%s&DestCity=%s&MType=0&FDate=%s' \
           u'&ANum=1&CNum=0&INum=0&PostType=0' % (
-              URL_PARAMS[Website.QUNAR][period['from_city']][0],
-              URL_PARAMS[Website.QUNAR][period['to_city']][0],
+              URL_PARAMS[Website.CH][period['from_city']][0],
+              URL_PARAMS[Website.CH][period['to_city']][0],
               period['date'],
           )
     response = requests.post(url)
@@ -51,10 +51,10 @@ def fetch(period):
     log_url = u'http://flights.ch.com/SHA-CKG.html?IfRet=false' \
               u'&OriCity=%s&OriCode=%s&DestCity=%s&DestCode=%s&FDate=%s' \
               u'&MType=0&ANum=1&CNum=0&INum=0&SType=0' % (
-                  URL_PARAMS[Website.QUNAR][period['from_city']][0],
-                  URL_PARAMS[Website.QUNAR][period['from_city']][1],
-                  URL_PARAMS[Website.QUNAR][period['to_city']][0],
-                  URL_PARAMS[Website.QUNAR][period['to_city']][1],
+                  URL_PARAMS[Website.CH][period['from_city']][0],
+                  URL_PARAMS[Website.CH][period['from_city']][1],
+                  URL_PARAMS[Website.CH][period['to_city']][0],
+                  URL_PARAMS[Website.CH][period['to_city']][1],
                   period['date'],
               )
     return util.deal(period, format_flights, Website.CH, log_url)

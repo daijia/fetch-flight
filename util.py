@@ -5,6 +5,7 @@ from datetime import date
 import smtplib
 from email.mime.text import MIMEText
 from email.header import Header
+from model.flight import Flight
 
 
 def send_email(content):
@@ -118,6 +119,35 @@ def deal(period, flights, website, url):
                 break
         flight[1], flight[4] = from_airport, to_airport
         selected_flights.append(flight)
-        if period.get('limit') and len(selected_flights) >= period.get('limit'):
+        if len(selected_flights) >= MAX_STORE_FLIGHT_COUNT:
             break
     return [(period['date'], website, url, x) for x in selected_flights]
+
+
+def get_price_trend(period):
+    flights = Flight.select(from_city=period['from_city'],
+                            to_city=period['to_city'],
+                            flight_date=period['date'])
+    result = {'all': _get_price_trend(flights)}
+    for website in AVAILABLE_WEBSITES:
+        result[website] = _get_price_trend(
+            filter(lambda x: x['website'] == website, flights))
+    return result
+
+
+def _get_price_trend(flights):
+    fetch_time_dict = {}
+    for flight in flights:
+        if flight['fetch_time'] in fetch_time_dict:
+            fetch_time_dict[flight['fetch_time']].append(flight)
+        else:
+            fetch_time_dict[flight['fetch_time']] = [flight]
+    result = []
+    for fetch_time in sorted(fetch_time_dict.keys(), reverse=True):
+        choose_flight = \
+            sorted(fetch_time_dict[fetch_time], key=lambda x: x['price'])[0]
+        if not result or \
+                (result and abs(choose_flight['price']-result[-1]['price']) >
+                    PRICE_FLUCTUATION):
+            result.append(choose_flight)
+    return result

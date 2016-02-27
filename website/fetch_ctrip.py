@@ -47,7 +47,7 @@ def fetch(period):
     if not block:
         return []
     flights = util.fetch_multi(block, 'find_elements_by_class_name',
-                                 'search_table_header')
+                               'search_table_header')
     format_flights = []
     for flight in flights:
         info = dig_info(flight)
