@@ -66,3 +66,4 @@ html/*.html
 test/*
 test.py
 :db_flight*
+db_flight*

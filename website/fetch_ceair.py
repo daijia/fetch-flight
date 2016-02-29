@@ -1,15 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from settings import *
 import util
 from selenium import webdriver
+from settings import Website, AIRLINE_NAME
+from setting.fetch_settings import AIRPORT_NAME_PARAMS, URL_PARAMS
 
 
 def dig_info(flight):
     try:
         part1 = flight.find_element_by_class_name('f-i').text
         elements = [x.strip() for x in part1.split('\n')]
-        info = elements[0].replace('|', ' ').strip()
+        info = elements[0].replace('|', ' ').strip().split()
+        airline = info[0].strip() if len(info) >= 1 else ''
+        flight_no = info[1].strip() if len(info) >= 2 else ''
+
         tmp_elements = []
         for element in elements:
             if '00:00' <= element <= '23:59':
@@ -39,11 +43,13 @@ def dig_info(flight):
                     continue
                 prices.append(int(''.join(digits)))
         if not prices:
+            util.log_error(u'CEAIR: 抓取价格失败')
             return None
         price = min(prices)
-        return [' '.join(info.split()), from_airport, from_time,
+        return [airline, flight_no, from_airport, from_time,
                 from_time_pair, to_airport, to_time, to_time_pair, price]
     except Exception as e:
+        util.log_error('CEAIR: ' + str(e))
         return None
 
 

@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from settings import *
 import util
 import requests
 import json
+from settings import Website, AIRLINE_NAME
+from setting.fetch_settings import URL_PARAMS
 
 
 def dig_info(flight):
     try:
-        number = flight['No']
+        number = flight['No'].strip()
         from_airport = flight['Departure'] + flight['DepartureStation']
         from_time = flight['DepartureTime'][11:16]
         to_airport = flight['Arrival'] + flight['ArrivalStation']
@@ -17,15 +18,17 @@ def dig_info(flight):
                   x.get('Cabins') and
                   isinstance(x['Cabins'][0].get('CabinPrice'), int)]
         if not prices:
+            util.log_error(u'CH: 抓取价格失败')
             return None
         from_time_pair = [int(x) for x in from_time.split(':')]
         to_time_pair = [int(x) for x in to_time.split(':')]
         if to_time_pair[0] < from_time_pair[0]:
             to_time_pair[0] += 24
         price = min(prices)
-        return [number, from_airport, from_time,
+        return [AIRLINE_NAME[Website.CH], number, from_airport, from_time,
                 from_time_pair, to_airport, to_time, to_time_pair, price]
     except Exception as e:
+        util.log_error('CH: ' + str(e))
         return None
 
 

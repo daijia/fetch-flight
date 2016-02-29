@@ -1,11 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from settings import *
 from datetime import date
 import smtplib
 from email.mime.text import MIMEText
 from email.header import Header
+import time
+
+from settings import AVAILABLE_WEBSITES, Airport, EXEC_TIME
+from conditions import PRICE_FLUCTUATION
+from setting.fetch_settings import AIRPORT_NAME_PARAMS
 from model.flight import Flight
+import logging
+logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s',
+                    filename='flight.log', level=logging.INFO,
+                    datefmt='%Y-%m-%d %H:%M:%S')
 
 
 def send_email(content):
@@ -81,7 +89,53 @@ def fetch_multi(block, func_name, value):
     return getattr(block, func_name)(value)
 
 
+def log_error(msg):
+    logging.log(logging.ERROR, str(msg))
+
+
+def log_info(msg):
+    logging.log(logging.INFO, str(msg))
+
+
 def deal(period, flights, website, url):
+    flights = sorted(flights, key=lambda x: x[-1])
+    for flight in flights:
+        airline, flight_no, from_airport_name, from_time, from_time_pair, \
+            to_airport_name, to_time, to_time_pair, price = flight
+        if to_time_pair[0] - from_time_pair[0] > 6:
+            log_info('long trip '+str(period)+' '+url+' '+str(flight))
+            continue
+        if not from_airport_name or not to_airport_name:
+            log_info('empty airport '+str(period)+' '+url+' '+str(flight))
+            continue
+        from_airport, to_airport = None, None
+        for x in Airport.ALL:
+            if AIRPORT_NAME_PARAMS[website][x] in from_airport_name:
+                from_airport = x
+                break
+        for x in Airport.ALL:
+            if AIRPORT_NAME_PARAMS[website][x] in to_airport_name:
+                to_airport = x
+                break
+        if from_airport is None or to_airport is None:
+            log_info('not found airport '+str(period)+' '+url+' '+str(flight))
+            continue
+        Flight.insert(from_airport=from_airport,
+                      to_airport=to_airport,
+                      from_time=from_time,
+                      to_time=to_time,
+                      from_city=period['from_city'],
+                      to_city=period['to_city'],
+                      website=website,
+                      price=price,
+                      flight_date=period['date'],
+                      airline=airline,
+                      flight_no=flight_no,
+                      url=url,
+                      fetch_time=EXEC_TIME)
+
+
+def deal2(period, flights, website, url):
     flights = sorted(flights, key=lambda x: x[-1])
     selected_flights = []
     for flight in flights:
@@ -103,12 +157,7 @@ def deal(period, flights, website, url):
                     <= to_time_pair <=
                     [int(x) for x in end_time[1].split(':')]):
                 continue
-        if all([AIRPORT_NAME_PARAMS[website][x] not in from_airport
-                for x in period['from_airport']]):
-            continue
-        if all([AIRPORT_NAME_PARAMS[website][x] not in to_airport
-                for x in period['to_airport']]):
-            continue
+
         for x in period['from_airport']:
             if AIRPORT_NAME_PARAMS[website][x] in from_airport:
                 from_airport = x
@@ -117,11 +166,11 @@ def deal(period, flights, website, url):
             if AIRPORT_NAME_PARAMS[website][x] in to_airport:
                 to_airport = x
                 break
+
         flight[1], flight[4] = from_airport, to_airport
         selected_flights.append(flight)
-        if len(selected_flights) >= MAX_STORE_FLIGHT_COUNT:
-            break
     return [(period['date'], website, url, x) for x in selected_flights]
+
 
 
 def get_price_trend(period):

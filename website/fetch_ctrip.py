@@ -1,13 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from settings import *
 import util
 from selenium import webdriver
+from settings import Website
+from setting.fetch_settings import URL_PARAMS
 
 
 def dig_info(flight):
     try:
-        info = flight.find_element_by_class_name('logo').text
+        info = flight.find_element_by_class_name('logo').text.split()
+        airline = info[0].strip() if len(info) >= 1 else ''
+        flight_no = info[1].strip() if len(info) >= 2 else ''
         divs = flight.find_element_by_class_name('right').\
             find_elements_by_tag_name('div')
         from_time = divs[0].find_element_by_class_name('time').text
@@ -29,9 +32,10 @@ def dig_info(flight):
             else:
                 break
         price = int(tmp_price)
-        return [' '.join(info.split()), from_airport, from_time,
+        return [airline, flight_no, from_airport, from_time,
                 from_time_pair, to_airport, to_time, to_time_pair, price]
     except Exception as e:
+        util.log_error('CTRIP: ' + str(e))
         return None
 
 
