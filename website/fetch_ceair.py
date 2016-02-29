@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import util
+import time
 from selenium import webdriver
-from constant import Website, AIRLINE_NAME
-from setting.fetch_settings import AIRPORT_NAME_PARAMS, URL_PARAMS
+from constant import Website
+from setting.fetch_settings import URL_PARAMS
 
 
 def dig_info(flight):
@@ -13,15 +14,13 @@ def dig_info(flight):
         info = elements[0].replace('|', ' ').strip().split()
         airline = info[0].strip() if len(info) >= 1 else ''
         flight_no = info[1].strip() if len(info) >= 2 else ''
-
-        tmp_elements = []
-        for element in elements:
-            if '00:00' <= element <= '23:59':
-                tmp_elements.append(element[0:5])
-            elif any([element.startswith(x)
-                      for x in AIRPORT_NAME_PARAMS[Website.CEAIR].values()]):
-                tmp_elements.append(element)
-        from_time, from_airport, to_time, to_airport = tmp_elements
+        airports = flight.find_elements_by_class_name('airport')
+        for airport in airports:
+            print ' '.join(airport.text.split())
+        from_infos = airports[0].text.split()
+        to_infos = airports[1].text.split()
+        from_time, from_airport = from_infos[0].strip(), from_infos[1].strip()
+        to_time, to_airport = to_infos[0].strip(), to_infos[1].strip()
 
         from_time_pair = [int(x) for x in from_time.split(':')]
         to_time_pair = [int(x) for x in to_time.split(':')]
@@ -46,6 +45,8 @@ def dig_info(flight):
             util.log_error(u'CEAIR: 抓取价格失败')
             return None
         price = min(prices)
+        if len(prices) >= 2 and price == 160:
+            price = prices[-2]
         return [airline, flight_no, from_airport, from_time,
                 from_time_pair, to_airport, to_time, to_time_pair, price]
     except Exception as e:
@@ -63,6 +64,7 @@ def fetch(period):
     block = util.fetch_one(browser, 'find_element_by_id', 'flight-info')
     if not block:
         return []
+    time.sleep(3)
     flights = util.fetch_multi(block, 'find_elements_by_class_name', 'section')
     format_flights = []
     for flight in flights:
