@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import util
 from selenium import webdriver
-from settings import Website
+from constant import Website
 from setting.fetch_settings import URL_PARAMS
 
 

@@ -15,7 +15,7 @@ from website import (
 )
 from tomorrow import threads
 
-from settings import Website, AVAILABLE_WEBSITES, THREAD_COUNT, WEBSITE_NAME
+from constant import Website, AVAILABLE_WEBSITES, THREAD_COUNT, WEBSITE_NAME
 from setting.fetch_settings import FETCH_PERIODS
 
 

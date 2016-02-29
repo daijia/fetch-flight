@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 import time
-from settings import City, Website, Airport
+from constant import City, Website, Airport
 
 FETCH_WEEK_NUM = 1
 

@@ -3,7 +3,7 @@
 import util
 import requests
 import json
-from settings import Website, AIRLINE_NAME
+from constant import Website, AIRLINE_NAME
 from setting.fetch_settings import URL_PARAMS
 
 

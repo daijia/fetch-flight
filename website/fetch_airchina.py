@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import util
 from selenium import webdriver
-from settings import Website, CITY_TO_AIRPORTS, AIRLINE_NAME
+from constant import Website, CITY_TO_AIRPORTS, AIRLINE_NAME
 from setting.fetch_settings import URL_PARAMS
 
 

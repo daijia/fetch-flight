@@ -5,12 +5,13 @@ import smtplib
 from email.mime.text import MIMEText
 from email.header import Header
 import time
+import logging
 
-from settings import AVAILABLE_WEBSITES, Airport, EXEC_TIME
-from conditions import PRICE_FLUCTUATION
+from constant import AVAILABLE_WEBSITES, Airport, EXEC_TIME
+from setting.subscribe_settings import PRICE_FLUCTUATION
 from setting.fetch_settings import AIRPORT_NAME_PARAMS
 from model.flight import Flight
-import logging
+
 logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s',
                     filename='flight.log', level=logging.INFO,
                     datefmt='%Y-%m-%d %H:%M:%S')
