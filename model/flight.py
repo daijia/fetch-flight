@@ -2,24 +2,23 @@
 # -*- coding: utf-8 -*-
 import dataset
 import time
-import uuid
 
 
 class Flight(object):
 
-    db = dataset.connect('sqlite:///:db_flight:')
+    db = dataset.connect('sqlite:///db_flight')
     table = db['tb_flight']
     __necessary_fields__ = ['from_airport', 'to_airport', 'from_city',
                             'to_city', 'from_time', 'to_time', 'website',
-                            'price', 'flight_date', 'time_range', 'fetch_time']
-    __fields__ = ['from_airport', 'to_airport', 'from_city', 'to_city',
+                            'price', 'flight_date', 'fetch_time']
+    __fields__ = ['id', 'from_airport', 'to_airport', 'from_city', 'to_city',
                   'from_time', 'to_time', 'website', 'price', 'flight_date',
-                  'detail', 'url', 'time_range', 'fetch_time']
+                  'airline', 'flight_no', 'url', 'fetch_time']
 
     @classmethod
     def insert(cls, **kwargs):
-        kwargs['detail'] = kwargs.get('detail') if kwargs.get('detail') else ''
-        kwargs['url'] = kwargs.get('url') if kwargs.get('url') else ''
+        for field in ['airline', 'flight_no', 'url']:
+            kwargs[field] = kwargs.get(field) if kwargs.get(field) else ''
         for f in Flight.__necessary_fields__:
             if f not in kwargs:
                 raise ValueError
@@ -29,7 +28,6 @@ class Flight(object):
                 raise ValueError
         kwargs['created_at'] = time.strftime("%Y-%m-%d %H:%M:%S",
                                              time.localtime())
-        kwargs['unique_id'] = uuid.uuid4().get_hex()
         return Flight.table.insert(kwargs)
 
     @classmethod
@@ -42,3 +40,11 @@ class Flight(object):
                 tmp[key] = flight[key]
             result.append(tmp)
         return result
+
+    @classmethod
+    def get_last_fetch_time(cls):
+        flights = Flight.table.find(order_by=['-fetch_time'], _limit=1)
+        if not flights:
+            return None
+        for flight in flights:
+            return flight['fetch_time']
