@@ -1,33 +1,34 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import datetime
-import time
 from constant import City, Website, Airport
+from setting import get_periods
 
-FETCH_WEEK_NUM = 1
+FETCH_WEBSITES = Website.ALL
+THREAD_COUNT = 5
 
+FETCH_WEEK_NUM = 8
 FETCH_PERIODS = [
-    # {
-    #     'from_city': City.SHANGHAI,
-    #     'to_city': City.CHONGQING,
-    #     'date': '2016-03-03',
-    # },
     {
         'to_city': City.SHANGHAI,
         'from_city': City.CHONGQING,
         'week_day': 0,
     },
-    # {
-    #     'from_city': City.SHANGHAI,
-    #     'to_city': City.CHONGQING,
-    #     'week_day': 5,
-    # },
-    # {
-    #     'from_city': City.SHANGHAI,
-    #     'to_city': City.CHONGQING,
-    #     'week_day': 6,
-    # },
+    {
+        'from_city': City.SHANGHAI,
+        'to_city': City.CHONGQING,
+        'week_day': 5,
+    },
+    {
+        'from_city': City.SHANGHAI,
+        'to_city': City.CHONGQING,
+        'week_day': 6,
+    },
 ]
+FETCH_PERIODS = get_periods(FETCH_PERIODS, FETCH_WEEK_NUM)
+# check settings
+for _period in FETCH_PERIODS:
+    datetime.datetime.strptime(_period['date'], '%Y-%m-%d')
 
 
 AIRPORT_NAME_PARAMS = {
@@ -58,31 +59,3 @@ URL_PARAMS = {
 }
 
 
-def _get_dates(weekday):
-    now_weekday = int(time.strftime("%w", time.localtime()))
-    start_day = weekday - now_weekday
-    if start_day < 0:
-        start_day += 7
-    days = range(start_day, start_day+FETCH_WEEK_NUM*7, 7)
-    dates = \
-        [time.strftime('%Y-%m-%d', time.localtime(int(time.time())+3600*24*day))
-         for day in days]
-    return dates
-
-
-_tmp_periods = list()
-for _period in FETCH_PERIODS:
-    if _period.get('date'):
-        _tmp_periods.append(_period)
-    else:
-        dates = _get_dates(_period['week_day'])
-        for date in dates:
-            _tmp_periods.append(_period.copy())
-            _tmp_periods[-1].pop('week_day')
-            _tmp_periods[-1]['date'] = date
-FETCH_PERIODS = _tmp_periods
-
-
-# check settings
-for _period in FETCH_PERIODS:
-    datetime.datetime.strptime(_period['date'], '%Y-%m-%d')

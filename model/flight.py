@@ -40,3 +40,11 @@ class Flight(object):
                 tmp[key] = flight[key]
             result.append(tmp)
         return result
+
+    @classmethod
+    def get_last_fetch_time(cls):
+        flights = Flight.table.find(order_by=['-fetch_time'], _limit=1)
+        if not flights:
+            return None
+        for flight in flights:
+            return flight['fetch_time']

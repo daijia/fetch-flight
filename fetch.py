@@ -15,8 +15,8 @@ from website import (
 )
 from tomorrow import threads
 
-from constant import Website, AVAILABLE_WEBSITES, THREAD_COUNT, WEBSITE_NAME
-from setting.fetch_settings import FETCH_PERIODS
+from constant import Website, WEBSITE_NAME
+from setting.fetch_settings import FETCH_PERIODS, FETCH_WEBSITES, THREAD_COUNT
 
 
 func_map = {
@@ -26,7 +26,7 @@ func_map = {
     Website.CH: fetch_ch,
     Website.AIRCHINA: fetch_airchina,
 }
-tasks = [(func_map[w], p, w) for p in FETCH_PERIODS for w in AVAILABLE_WEBSITES]
+tasks = [(func_map[w], p, w) for p in FETCH_PERIODS for w in FETCH_WEBSITES]
 random.shuffle(tasks)
 
 

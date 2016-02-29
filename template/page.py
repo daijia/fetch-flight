@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from constant import AVAILABLE_WEBSITES, WEBSITE_NAME, AIRPORT_NAME
+from constant import Website, WEBSITE_NAME, AIRPORT_NAME
 
 main_page1 = '''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -185,7 +185,7 @@ trend_info = """
                 <th><span>抓取时间</span></th>
                 <th><span>起落</span></th>
                 <th><span>来源</span></th>
-                <th><span>详细</span></th>
+                <th><span>航班号</span></th>
               </tr>
             </thead>
             <tbody>
@@ -207,19 +207,21 @@ def get_html(message_info, trend_dict):
     divs = []
     for message in message_info:
         all_items = []
-        for line in message['lines']:
-            _date, website, url, flight = line
-            url_info = u'<a href="%s">%s</a>' % (str(url), WEBSITE_NAME[website])
+        for flight in message['flights']:
+            url_info = u'<a href="%s">%s</a>' % \
+                       (str(flight['url']), WEBSITE_NAME[flight['website']])
             all_items.append(
-                one_item % (u'¥'+str(flight[-1]), flight[2], AIRPORT_NAME[flight[1]],
-                            flight[5], AIRPORT_NAME[flight[4]], url_info,
-                            flight[0][0:20]))
+                one_item % (u'¥'+str(flight['price']), flight['from_time'],
+                            AIRPORT_NAME[flight['from_airport']],
+                            flight['to_time'],
+                            AIRPORT_NAME[flight['to_airport']], url_info,
+                            flight['airline']+' '+flight['flight_no']))
         date_flights = trend_dict[(message['date'], message['from_city'],
                                    message['to_city'])]
         all_trend_items = []
-        for k in ['all'] + AVAILABLE_WEBSITES:
+        for k in ['all'] + Website.ALL:
             trend_flights = date_flights.get(k)
-            if not trend_flights or len(trend_flights) <= 1:
+            if not trend_flights and len(trend_flights) > 0:
                 continue
             tmp_items = []
             for tmp in trend_flights:
@@ -229,7 +231,7 @@ def get_html(message_info, trend_dict):
                                   tmp['from_time'],
                                   tmp['to_time'],
                                   WEBSITE_NAME[tmp['website']],
-                                  tmp['detail']))
+                                  tmp['airline'] + ' ' + tmp['flight_no']))
             head = u'汇总价格趋势' if k == 'all' else WEBSITE_NAME[k] + u'价格趋势'
             all_trend_items.append(trend_info % (head, '\n'.join(tmp_items)))
         divs.append(body % (u'%s[%s] %s => %s的航班' %

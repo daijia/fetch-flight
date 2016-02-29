@@ -22,11 +22,7 @@ class Website(object):
     AIRCHINA = 3
     CH = 4
     CSAIR = 5
-
-
-THREAD_COUNT = 5
-AVAILABLE_WEBSITES = [Website.CTRIP, Website.CH, Website.CEAIR, Website.CSAIR,
-                      Website.AIRCHINA]
+    ALL = [CTRIP, CH, CEAIR, CSAIR, AIRCHINA]
 
 
 WEBSITE_NAME = {
