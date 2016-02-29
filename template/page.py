@@ -153,8 +153,8 @@ body = '''
             <thead>
               <tr>
                 <th><span>价格</span></th>
-                <th><span>起</span></th>
-                <th><span>落</span></th>
+                <th><span>起飞</span></th>
+                <th><span>降落</span></th>
                 <th><span>来源</span></th>
                 <th><span>详细</span></th>
               </tr>
@@ -182,10 +182,10 @@ trend_info = """
             <thead>
               <tr>
                 <th><span>价格</span></th>
-                <th><span>抓取时间</span></th>
+                <th><span>抓取</span></th>
                 <th><span>起落</span></th>
                 <th><span>来源</span></th>
-                <th><span>航班号</span></th>
+                <th><span>航班</span></th>
               </tr>
             </thead>
             <tbody>
@@ -197,7 +197,7 @@ trend_info = """
 trend_item = '''              <tr>
                 <td>%s</td>
                 <td>%s</td>
-                <td>%s => %s</td>
+                <td>%s=>%s</td>
                 <td>%s</td>
                 <td>%s</td>
               </tr>'''
@@ -223,13 +223,13 @@ def get_html(message_info, trend_dict):
         all_trend_items = []
         for k in ['all'] + Website.ALL:
             trend_flights = date_flights.get(k)
-            if not trend_flights and len(trend_flights) > 1:
+            if not trend_flights or len(trend_flights) <= 1:
                 continue
             tmp_items = []
             for tmp in trend_flights:
                 tmp_items.append(
                     trend_item % (u'¥'+str(tmp['price']),
-                                  tmp['fetch_time'],
+                                  tmp['fetch_time'][5:16],
                                   tmp['from_time'],
                                   tmp['to_time'],
                                   WEBSITE_NAME[tmp['website']],

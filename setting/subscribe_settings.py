@@ -5,13 +5,13 @@ from constant import Airport, City, CITY_TO_AIRPORTS
 from setting import get_periods
 
 
-TOP_CHEAP_COUNT = 8
+TOP_CHEAP_COUNT = 6
 PRICE_FLUCTUATION = 0
 SUBSCRIBE_EMAIL = 'iwritepython@163.com'
-IS_SEND_EMAIL = True
+IS_SEND_EMAIL = False
 IS_RECORD_HTML = True
 
-SUBSCRIBE_WEEK_NUM = 8
+SUBSCRIBE_WEEK_NUM = 6
 SUBSCRIBE_PERIODS = [
     {
         'from_time': ['16:00', '21:00'],

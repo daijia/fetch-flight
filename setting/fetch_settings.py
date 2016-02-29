@@ -7,7 +7,7 @@ from setting import get_periods
 FETCH_WEBSITES = Website.ALL
 THREAD_COUNT = 5
 
-FETCH_WEEK_NUM = 8
+FETCH_WEEK_NUM = 6
 FETCH_PERIODS = [
     {
         'to_city': City.SHANGHAI,
