@@ -6,6 +6,7 @@ sys.setdefaultencoding('utf8')
 import util
 import random
 import traceback
+import time
 from website import (
     fetch_airchina,
     fetch_ceair,
@@ -40,6 +41,7 @@ def worker(task):
         util.log_error(WEBSITE_NAME[website] + ' ' + str(e) + ' ' +
                        str(period) +
                        traceback.format_exc().replace('\n', '  |  '))
+    time.sleep(5)
 
 
 def fetch():
