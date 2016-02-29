@@ -44,18 +44,8 @@ def get_top_cheap_flights(period):
     params = {'from_city': period['from_city'], 'to_city': period['to_city'],
               'flight_date': period['date'], 'fetch_time': last_fetch_time}
     flights = Flight.select(**params)
-    selected_flights = []
-    for flight in flights:
-        if flight['to_time'] < flight['from_time']:
-            flight['to_time'] = str(int(flight['to_time'][0:2])+24) + \
-                flight['to_time'][2:]
-        if flight['from_airport'] in period['from_airport'] and \
-                flight['to_airport'] in period['to_airport'] and \
-                period['from_time'][0] <= flight['from_time'] \
-                <= period['from_time'][1] and \
-                period['to_time'][0] <= flight['to_time'] \
-                <= period['to_time'][1]:
-            selected_flights.append(flight)
+    selected_flights = [flight for flight in flights
+                        if _filter_flight(flight, period)]
     return sorted(selected_flights, key=lambda x: x['price'])[0:TOP_CHEAP_COUNT]
 
 
@@ -63,11 +53,26 @@ def get_price_trend(period):
     flights = Flight.select(from_city=period['from_city'],
                             to_city=period['to_city'],
                             flight_date=period['date'])
+    flights = [flight for flight in flights if _filter_flight(flight, period)]
     result = {'all': _get_price_trend(flights)}
     for website in Website.ALL:
         result[website] = _get_price_trend(
             filter(lambda x: x['website'] == website, flights))
     return result
+
+
+def _filter_flight(flight, period):
+    if flight['to_time'] < flight['from_time']:
+        flight['to_time'] = str(int(flight['to_time'][0:2])+24) + \
+            flight['to_time'][2:]
+    if flight['from_airport'] in period['from_airport'] and \
+            flight['to_airport'] in period['to_airport'] and \
+            period['from_time'][0] <= flight['from_time'] \
+            <= period['from_time'][1] and \
+            period['to_time'][0] <= flight['to_time'] \
+            <= period['to_time'][1]:
+        return True
+    return False
 
 
 def _get_price_trend(flights):

@@ -206,6 +206,8 @@ trend_item = '''              <tr>
 def get_html(message_info, trend_dict):
     divs = []
     for message in message_info:
+        if not message['flights']:
+            continue
         all_items = []
         for flight in message['flights']:
             url_info = u'<a href="%s">%s</a>' % \
@@ -221,7 +223,7 @@ def get_html(message_info, trend_dict):
         all_trend_items = []
         for k in ['all'] + Website.ALL:
             trend_flights = date_flights.get(k)
-            if not trend_flights and len(trend_flights) > 0:
+            if not trend_flights and len(trend_flights) > 1:
                 continue
             tmp_items = []
             for tmp in trend_flights:
@@ -232,8 +234,11 @@ def get_html(message_info, trend_dict):
                                   tmp['to_time'],
                                   WEBSITE_NAME[tmp['website']],
                                   tmp['airline'] + ' ' + tmp['flight_no']))
-            head = u'汇总价格趋势' if k == 'all' else WEBSITE_NAME[k] + u'价格趋势'
-            all_trend_items.append(trend_info % (head, '\n'.join(tmp_items)))
+            if tmp_items:
+                head = u'汇总价格趋势' if k == 'all' \
+                    else WEBSITE_NAME[k] + u'价格趋势'
+                all_trend_items.append(
+                    trend_info%(head, '\n'.join(tmp_items)))
         divs.append(body % (u'%s[%s] %s => %s的航班' %
                             (message['date'], message['week_day_info'],
                              message['from_city_name'],
