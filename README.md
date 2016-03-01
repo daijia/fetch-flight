@@ -8,4 +8,4 @@ enjoy~ ^_^
 
 上效果图
 
-![Image text](https://github.com/daijia/fetch-flight/raw/master/example.png）
+![Alt Text](https://github.com/daijia/fetch-flight/raw/master/example.png）
