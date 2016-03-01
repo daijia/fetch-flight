@@ -7,7 +7,7 @@ from setting import get_periods
 
 TOP_CHEAP_COUNT = 8
 PRICE_FLUCTUATION = 0
-SUBSCRIBE_EMAIL = 'iwritepython@163.com'
+SUBSCRIBE_EMAIL = 'your_subscribe_email@xxx.com'
 IS_SEND_EMAIL = True
 IS_RECORD_HTML = False
 

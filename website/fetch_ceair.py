@@ -15,8 +15,6 @@ def dig_info(flight):
         airline = info[0].strip() if len(info) >= 1 else ''
         flight_no = info[1].strip() if len(info) >= 2 else ''
         airports = flight.find_elements_by_class_name('airport')
-        for airport in airports:
-            print ' '.join(airport.text.split())
         from_infos = airports[0].text.split()
         to_infos = airports[1].text.split()
         from_time, from_airport = from_infos[0].strip(), from_infos[1].strip()
