@@ -48,3 +48,7 @@ class Flight(object):
             return None
         for flight in flights:
             return flight['fetch_time']
+
+    @classmethod
+    def delete(cls, **kwargs):
+        Flight.table.delete(**kwargs)

@@ -41,6 +41,8 @@ def dig_info(flight):
                 if not digits:
                     continue
                 prices.append(int(''.join(digits)))
+        if prices[-1] == 160:
+            prices = prices[0:-1]
         if not prices:
             util.log_error(u'CEAIR: 抓取价格失败')
             return None
